@@ -4,7 +4,9 @@
       <%= render BlockScoutWeb.StakesView, "_stakes_stats_item.html", title: gettext("Epoch number"), value: @epoch_number %>
       <%= render BlockScoutWeb.StakesView, "_stakes_stats_item.html", title: gettext("Block number"), value: @block_number %>
       <%= render BlockScoutWeb.StakesView, "_stakes_stats_item.html", title: gettext("Next epoch in"), value: "#{@epoch_end_in} blocks" %>
-      <%= render BlockScoutWeb.StakesView, "_stakes_stats_item_account.html", title: "0x1fddEc96688e0538A316C64dc...", balance: "20", staked: "1000", logged_in: @logged_in %>
+      <div data-selector='account-info'>
+        <%= render BlockScoutWeb.StakesView, "_stakes_stats_item_account.html", logged_in: false %>
+      </div>
       <!-- Buttons -->
       <div class="stakes-top-buttons">
         <%= render BlockScoutWeb.CommonComponentsView, "_btn_add_full.html", text: gettext("Become Candidate"), extra_class: "js-become-candidate" %>

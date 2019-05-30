@@ -10,18 +10,18 @@ defmodule BlockScoutWeb.PoolsController do
   import BlockScoutWeb.Chain, only: [paging_options: 1, next_page_params: 3, split_list_by_page: 1]
 
   def validators(conn, params) do
-    render_list(:validator, conn, params)
+    render_template(:validator, conn, params)
   end
 
   def active_pools(conn, params) do
-    render_list(:active, conn, params)
+    render_template(:active, conn, params)
   end
 
   def inactive_pools(conn, params) do
-    render_list(:inactive, conn, params)
+    render_template(:inactive, conn, params)
   end
 
-  defp render_list(_, conn, %{"modal_window" => window_name, "pool_hash" => pool_hash} = params) do
+  defp render_template(_, conn, %{"modal_window" => window_name, "pool_hash" => pool_hash} = params) do
     window =
       pool_hash
       |> Chain.staking_pool()
@@ -30,7 +30,7 @@ defmodule BlockScoutWeb.PoolsController do
     json(conn, %{window: window})
   end
 
-  defp render_list(filter, conn, %{"type" => "JSON"} = params) do
+  defp render_template(filter, conn, %{"type" => "JSON"} = params) do
     [paging_options: options] = paging_options(params)
 
     last_index =
@@ -80,7 +80,7 @@ defmodule BlockScoutWeb.PoolsController do
     )
   end
 
-  defp render_list(filter, conn, _) do
+  defp render_template(filter, conn, _) do
     average_block_time = AverageBlockTime.average_block_time()
     epoch_number = EpochCounter.epoch_number()
     epoch_end_block = EpochCounter.epoch_end_block()

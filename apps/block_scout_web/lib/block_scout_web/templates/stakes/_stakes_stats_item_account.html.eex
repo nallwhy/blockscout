@@ -8,7 +8,7 @@
             </svg>
         </div>
         <% else %>
-            <span class="stakes-top-stats-login">Login</span> with MetaMask
+            <span data-selector="login-button" class="stakes-top-stats-login">Login</span> with MetaMask
         <% end %>
     </span>
     <span class="stakes-top-stats-label">
@@ -19,7 +19,7 @@
             else
                 "-"
             end
-        %> POA20</span>
+        %></span>
         <span class="stakes-top-stats-label-item"><%= gettext "Staked" %>:
         <%=
             if assigns[:staked] do
@@ -27,7 +27,7 @@
             else
                 "-"
             end
-        %> POA20</span>
+        %></span>
         </span>
     </span>
 </div>

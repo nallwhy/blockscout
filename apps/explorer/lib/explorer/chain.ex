@@ -2984,6 +2984,15 @@ defmodule Explorer.Chain do
 
   defp staking_pool_filter(query, _), do: query
 
+  def staking_pool(hash) do
+    query = from(
+      pool in StakingPool,
+      where: pool.staking_address_hash == ^hash
+    )
+
+    Repo.one(query)
+  end
+
   defp with_decompiled_code_flag(query, hash) do
     has_decompiled_code_query =
       from(decompiled_contract in DecompiledSmartContract,

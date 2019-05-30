@@ -20,44 +20,116 @@ $(function () {
 })
 
 window.openValidatorInfoModal = function(id) {
-  $('#validatorInfoModal' + id).modal()
+  var el = $("#stakesModalWindows");
+  var path = el.attr("current_path");
+
+  $.getJSON(path, {modal_window: "info", pool_hash: id})
+    .done(function(response) {
+      el.html(response.window);
+      $('#validatorInfoModal').modal();
+    })
 }
 
 window.openStakeModal = function(id) {
-  const modal = '#stakeModal' + id;
-  const progress = parseInt($(`${modal} .js-stakes-progress-data-progress`).text())
-  const total = parseInt($(`${modal} .js-stakes-progress-data-total`).text())
+  var el = $("#stakesModalWindows");
+  var path = el.attr("current_path");
 
-  $(modal).modal()
+  $.getJSON(path, {modal_window: "make_stake", pool_hash: id})
+    .done(function(response) {
+      el.html(response.window);
 
-  setupStakesProgress(progress, total, modal)
+      const modal = '#stakeModal';
+      const progress = parseInt($(`${modal} .js-stakes-progress-data-progress`).text())
+      const total = parseInt($(`${modal} .js-stakes-progress-data-total`).text())
+
+      $(modal).modal()
+
+      setupStakesProgress(progress, total, $(`${modal} .js-stakes-progress`))
+    })
 }
 
 window.openWithdrawModal = function(id) {
-  const modal = '#withdrawModal' + id;
-  const progress = parseInt($(`${modal} .js-stakes-progress-data-progress`).text())
-  const total = parseInt($(`${modal} .js-stakes-progress-data-total`).text())
+  var el = $("#stakesModalWindows");
+  var path = el.attr("current_path");
 
-  $(modal).modal()
+  $.getJSON(path, {modal_window: "withdraw", pool_hash: id})
+    .done(function(response) {
+      el.html(response.window);
 
-  setupStakesProgress(progress, total, modal)
+      const modal = '#withdrawModal';
+      const progress = parseInt($(`${modal} .js-stakes-progress-data-progress`).text())
+      const total = parseInt($(`${modal} .js-stakes-progress-data-total`).text())
+
+      $(modal).modal()
+
+      setupStakesProgress(progress, total, $(`${modal} .js-stakes-progress`))
+    })
 }
 
-function setupStakesProgress (progress, total, modal) {
-  const stakeProgress = $(`${modal} .js-stakes-progress`)
+window.openMoveStakeModal = function(id) {
+  var el = $("#stakesModalWindows");
+  var path = el.attr("current_path");
+
+  $.getJSON(path, {modal_window: "move_stake", pool_hash: id})
+    .done(function(response) {
+      el.html(response.window);
+
+      const modal = '#moveStakeModal';
+      const progress = parseInt($(`${modal} .js-stakes-progress-data-progress`).text())
+      const total = parseInt($(`${modal} .js-stakes-progress-data-total`).text())
+
+      $(modal).modal()
+
+      setupStakesProgress(progress, total, $(`${modal} .js-stakes-progress`))
+    })
+}
+
+window.selectedStakeMovePool = function(from_hash, to_hash) {
+  var el = $("#stakesModalWindows");
+  var path = el.attr("current_path");
+  $('.modal').modal('hide');
+  $('.modal-backdrop').remove();
+
+  $.getJSON(path, {modal_window: "move_selected", pool_hash: from_hash, pool_to: to_hash})
+    .done(function(response) {
+      el.html(response.window);
+
+      const modal = '#moveStakeModalSelected';
+      var progress_from = parseInt($(`${modal} .js-stakes-progress-data-progress.js-pool-from-progress`).text())
+      var total_from = parseInt($(`${modal} .js-stakes-progress-data-total.js-pool-from-progress`).text())
+
+      var progress_to = parseInt($(`${modal} .js-stakes-progress-data-progress.js-pool-to-progress`).text())
+      var total_to = parseInt($(`${modal} .js-stakes-progress-data-total.js-pool-to-progress`).text())  
+
+      $(modal).modal();
+
+      setupStakesProgress(progress_from, total_from, $(`${modal} .js-pool-from-progress`))
+      setupStakesProgress(progress_to, total_to, $(`${modal} .js-pool-to-progress`))
+    })
+}
+
+function setupStakesProgress (progress, total, progress_element) {
+  const stakeProgress = progress_element;
   const primaryColor = $('.btn-full-primary').css('background-color')
   const backgroundColors = [
     primaryColor,
     'rgba(202, 199, 226, 0.5)'
   ]
   const progressBackground = total - progress
+  var data;
+  if(total > 0) {
+    data = [progress, progressBackground];
+  }
+  else {
+    data = [0, 1];
+  }
 
   // eslint-disable-next-line no-unused-vars
   let myChart = new Chart(stakeProgress, {
     type: 'doughnut',
     data: {
       datasets: [{
-        data: [progress, progressBackground],
+        data: data,
         backgroundColor: backgroundColors,
         hoverBackgroundColor: backgroundColors,
         borderWidth: 0

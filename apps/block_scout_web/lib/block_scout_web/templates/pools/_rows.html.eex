@@ -5,7 +5,7 @@
     tooltip = if @pool.is_validator, do: "This is a validator", else: false
     render BlockScoutWeb.StakesView,
     "_stakes_address.html",
-    address: binary_part(to_string(@pool.staking_address_hash), 0, 13),
+    address: @pool.staking_address_hash,
     tooltip: tooltip,
     index: @pool.position
     %>
@@ -34,21 +34,10 @@
       </span>
     <% else %>
       <div class="stakes-controls">
-        <%= render BlockScoutWeb.StakesView, "_stakes_control_move.html", extra_class: "js-move-stake", index: @pool.position %>
-        <%= render BlockScoutWeb.StakesView, "_stakes_control_withdraw.html", index: @pool.position%>
-        <%= render BlockScoutWeb.StakesView, "_stakes_control_stake.html", index: @pool.position %>
+        <%= render BlockScoutWeb.StakesView, "_stakes_control_move.html", address: @pool.staking_address_hash %>
+        <%= render BlockScoutWeb.StakesView, "_stakes_control_withdraw.html", address: @pool.staking_address_hash %>
+        <%= render BlockScoutWeb.StakesView, "_stakes_control_stake.html", address: @pool.staking_address_hash %>
       </div>
     <% end %>
-  </td>
-  <td colspan="0" style="display:inherit;">
-    <%= 
-      render BlockScoutWeb.StakesView,
-      "_stakes_modal_validator_info.html",
-      validator: @pool,
-      index: @pool.position,
-      average_block_time: @average_block_time
-    %>
-    <%= render BlockScoutWeb.StakesView, "_stakes_modal_stake.html", pool: @pool, index: @pool.position %>
-    <%= render BlockScoutWeb.StakesView, "_stakes_modal_withdraw.html", pool: @pool, index: @pool.position %>
   </td>
 </tr>

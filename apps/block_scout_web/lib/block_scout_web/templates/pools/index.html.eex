@@ -48,5 +48,7 @@
         data_prev_page_button: true 
       %>
     </div>
+
+    <%= render BlockScoutWeb.StakesView, "_modal_windows.html", current_path: @current_path %>
   </div>
 </section>

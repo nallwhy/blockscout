@@ -1,15 +1,15 @@
 <div class="stakes-progress">
   <div class="stakes-progress-graph">
     <canvas
-      class="stakes-progress-graph-canvas js-stakes-progress"
+      class="stakes-progress-graph-canvas js-stakes-progress <%= if assigns[:extra_class], do: @extra_class %>"
       height="125"
       width="125"
     ></canvas>
     <div class="stakes-progress-data">
-      <div class="stakes-progress-data-progress js-stakes-progress-data-progress">
+      <div class="stakes-progress-data-progress js-stakes-progress-data-progress <%= if assigns[:extra_class], do: @extra_class %>">
         <%= format_wei_value(@pool.self_staked_amount, :ether, include_unit_label: false) %>
       </div>
-      <div class="stakes-progress-data-total js-stakes-progress-data-total">
+      <div class="stakes-progress-data-total js-stakes-progress-data-total <%= if assigns[:extra_class], do: @extra_class %>">
         <%= format_wei_value(@pool.staked_amount, :ether, include_unit_label: false) %>
       </div>
     </div>

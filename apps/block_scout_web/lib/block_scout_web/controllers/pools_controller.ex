@@ -3,7 +3,7 @@ defmodule BlockScoutWeb.PoolsController do
 
   alias Explorer.Counters.AverageBlockTime
   alias Explorer.Chain
-  alias BlockScoutWeb.PoolsView
+  alias BlockScoutWeb.{PoolsView, StakesView}
   alias Explorer.Staking.EpochCounter
   alias Explorer.Chain.BlockNumberCache
 
@@ -19,6 +19,15 @@ defmodule BlockScoutWeb.PoolsController do
 
   def inactive_pools(conn, params) do
     render_list(:inactive, conn, params)
+  end
+
+  defp render_list(_, conn, %{"modal_window" => window_name, "pool_hash" => pool_hash} = params) do
+    window =
+      pool_hash
+      |> Chain.staking_pool()
+      |> render_modal(window_name, params)
+
+    json(conn, %{window: window})
   end
 
   defp render_list(filter, conn, %{"type" => "JSON"} = params) do
@@ -99,5 +108,77 @@ defmodule BlockScoutWeb.PoolsController do
 
   defp next_page_path(:inactive, conn, params) do
     inactive_pools_path(conn, :inactive_pools, params)
+  end
+
+  defp render_modal(pool, "info", _params) do
+    Phoenix.View.render_to_string(
+      StakesView,
+      "_stakes_modal_validator_info.html",
+      validator: pool
+    )
+  end
+
+  defp render_modal(pool, "make_stake", _params) do
+    Phoenix.View.render_to_string(
+      StakesView,
+      "_stakes_modal_stake.html",
+      pool: pool
+    )
+  end
+
+  defp render_modal(pool, "withdraw", _params) do
+    Phoenix.View.render_to_string(
+      StakesView,
+      "_stakes_modal_withdraw.html",
+      pool: pool
+    )
+  end
+
+  defp render_modal(%{staking_address_hash: address} = pool, "move_stake", _params) do
+    pools =
+      :active
+      |> Chain.staking_pools()
+      |> Enum.filter(&(&1.staking_address_hash != address))
+      |> Enum.map(fn %{staking_address_hash: hash} ->
+        string_hash = to_string(hash)
+        [
+          key: binary_part(string_hash, 0, 13),
+          value: string_hash
+        ]
+      end)
+
+    Phoenix.View.render_to_string(
+      StakesView,
+      "_stakes_modal_move.html",
+      pool: pool,
+      pools: pools
+    )
+  end
+
+  defp render_modal(%{staking_address_hash: address} = pool, "move_selected", params) do
+    pools =
+      :active
+      |> Chain.staking_pools()
+      |> Enum.filter(&(&1.staking_address_hash != address))
+      |> Enum.map(fn %{staking_address_hash: hash} ->
+        string_hash = to_string(hash)
+        [
+          key: binary_part(string_hash, 0, 13),
+          value: string_hash
+        ]
+      end)
+
+    pool_to =
+      params
+      |> Map.get("pool_to")
+      |> Chain.staking_pool()
+
+    Phoenix.View.render_to_string(
+      StakesView,
+      "_stakes_modal_move_selected.html",
+      pool_from: pool,
+      pool_to: pool_to,
+      pools: pools
+    )
   end
 end

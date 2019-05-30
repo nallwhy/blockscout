@@ -1,0 +1,1 @@
+<div id="stakesModalWindows" current_path=<%= @current_path %>></div>

@@ -3,6 +3,7 @@ defmodule BlockScoutWeb.PoolsController do
 
   alias Explorer.Counters.AverageBlockTime
   alias Explorer.Chain
+  alias Explorer.Chain.Wei
   alias BlockScoutWeb.{PoolsView, StakesView}
   alias Explorer.Staking.EpochCounter
   alias Explorer.Chain.BlockNumberCache
@@ -28,6 +29,24 @@ defmodule BlockScoutWeb.PoolsController do
       |> render_modal(window_name, params)
 
     json(conn, %{window: window})
+  end
+
+  defp render_template(_, conn, %{"command" => "set_session", "address" => address}) do
+    if get_session(conn, :address_hash) == address do
+      json(conn, %{reload: false})
+    else
+      case Chain.string_to_address_hash(address) do
+        {:ok, _address} ->
+          conn
+          |> put_session(:address_hash, address)
+          |> json(%{reload: true})
+
+        _ ->
+          conn
+          |> delete_session(:address_hash)
+          |> json(%{reload: true})
+      end
+    end
   end
 
   defp render_template(filter, conn, %{"type" => "JSON"} = params) do
@@ -85,6 +104,7 @@ defmodule BlockScoutWeb.PoolsController do
     epoch_number = EpochCounter.epoch_number()
     epoch_end_block = EpochCounter.epoch_end_block()
     block_number = BlockNumberCache.max_number()
+    user = gelegator_info(conn)
 
     options = [
       average_block_time: average_block_time,
@@ -92,10 +112,35 @@ defmodule BlockScoutWeb.PoolsController do
       epoch_number: epoch_number,
       epoch_end_in: epoch_end_block - block_number,
       block_number: block_number,
-      current_path: current_path(conn)
+      current_path: current_path(conn),
+      user: user,
+      logged_in: user != nil
     ]
 
     render(conn, "index.html", options)
+  end
+
+  defp gelegator_info(conn) do
+    address = get_session(conn, :address_hash)
+    if address do
+      case Chain.delegator_info(address) do
+        [balance, staked] ->
+          {:ok, staked_wei} = Wei.cast(staked)
+          %{
+            address: address,
+            balance: balance,
+            staked: staked_wei
+          }
+
+        _ ->
+          {:ok, zero_wei} = Wei.cast(0)
+          %{
+            address: address,
+            balance: zero_wei,
+            staked: zero_wei
+          }
+      end
+    end
   end
 
   defp next_page_path(:validator, conn, params) do

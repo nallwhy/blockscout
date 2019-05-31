@@ -39,6 +39,7 @@ defmodule Explorer.Chain do
     Log,
     SmartContract,
     StakingPool,
+    StakingPoolsDelegator,
     Token,
     TokenTransfer,
     Transaction,
@@ -2988,6 +2989,19 @@ defmodule Explorer.Chain do
     query = from(
       pool in StakingPool,
       where: pool.staking_address_hash == ^hash
+    )
+
+    Repo.one(query)
+  end
+
+  def delegator_info(address) do
+    query = from(
+      address in Address,
+      where: address.hash == ^address,
+      join: delegator in StakingPoolsDelegator,
+      on: delegator.delegator_address_hash == address.hash,
+      group_by: address.hash,
+      select: [address.fetched_coin_balance, sum(delegator.stake_amount)]
     )
 
     Repo.one(query)

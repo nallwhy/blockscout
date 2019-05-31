@@ -8,18 +8,25 @@ import Web3 from 'web3'
 
 export const initialState = {
   web3: null,
-  authorized: false,
   account: null
 }
 
 export function reducer (state = initialState, action) {
   switch (action.type) {
     case 'WEB3_DETECTED': {
-      return Object.assign({}, state, { web3: action.msg })
+      return Object.assign({}, state, { web3: action.web3 })
     }
     case 'AUTHORIZED': {
-      console.log(action.account)
-      return Object.assign({}, state, {authorized: true, account: action.account})
+      var sessionUserAddress = $('[data-page="stakes"]').data("user-address") || null
+      if(!(sessionUserAddress === action.account)) {
+        $.getJSON(state.accountPath, {command: 'set_session', address: action.account})
+          .done(response => {
+            if(response.reload == true) {
+              document.location.reload();
+            }
+          })
+      }
+      return Object.assign({}, state, { account: action.account })
     }
     default:
       return state
@@ -38,7 +45,7 @@ const elements = {
         $el[0].addEventListener("click", async() => {
           try {
             await window.ethereum.enable();
-            const accounts = await web3.eth.getAccounts()
+            const accounts = await state.web3.eth.getAccounts()
 
             const defaultAccount = accounts[0] || null
             store.dispatch({type: "AUTHORIZED", account: defaultAccount})
@@ -57,15 +64,6 @@ const elements = {
         accountPath: $el.data('async-listing')
       }
     }
-  },
-  '[data-selector="account-info"]': {
-    render($el, state, oldState) {
-      if(state.account === oldState.account) return
-      $.getJSON(state.accountPath, {render: 'account_info', address: state.account})
-        .done(response => {
-          $el.empty().append(response.data)
-        })
-    }
   }
 }
 
@@ -80,10 +78,15 @@ if ($stakesPage.length) {
 
 function get_web3(store) {
   if (window.ethereum) {
-    web3 = new Web3(window.ethereum)
+    let web3 = new Web3(window.ethereum)
     console.log('Injected web3 detected.')
+    web3.eth.getAccounts()
+      .then(accounts => {
+        var defaultAccount = accounts[0] || null
+        store.dispatch({type: "AUTHORIZED", account: defaultAccount})
+      })
 
-    store.dispatch({type: "WEB3_DETECTED", msg: web3})
+    store.dispatch({type: "WEB3_DETECTED", web3: web3})
   }
 }
 

@@ -3027,11 +3027,11 @@ defmodule Explorer.Chain do
     Repo.one(query)
   end
 
-  def delegator_relation(delegator_address, pool_address) do
+  def staking_delegator(delegator_address, pool_address) do
     query =
       from(
         pd in StakingPoolsDelegator,
-        where: pd.staking_address_hash == ^pool_address,
+        where: pd.pool_address_hash == ^pool_address,
         where: pd.delegator_address_hash == ^delegator_address
       )
 

@@ -20,8 +20,8 @@ $(function () {
 })
 
 window.openValidatorInfoModal = function(id) {
-  var el = $("#stakesModalWindows");
-  var path = el.attr("current_path");
+  const el = $("#stakesModalWindows");
+  const path = el.attr("current_path");
 
   $.getJSON(path, {modal_window: "info", pool_hash: id})
     .done(function(response) {
@@ -31,8 +31,10 @@ window.openValidatorInfoModal = function(id) {
 }
 
 window.openStakeModal = function(id) {
-  var el = $("#stakesModalWindows");
-  var path = el.attr("current_path");
+  const el = $("#stakesModalWindows");
+  const path = el.attr("current_path");
+  $('.modal').modal('hide');
+  $('.modal-backdrop').remove();
 
   $.getJSON(path, {modal_window: "make_stake", pool_hash: id})
     .done(function(response) {
@@ -49,8 +51,10 @@ window.openStakeModal = function(id) {
 }
 
 window.openWithdrawModal = function(id) {
-  var el = $("#stakesModalWindows");
-  var path = el.attr("current_path");
+  const el = $("#stakesModalWindows");
+  const path = el.attr("current_path");
+  $('.modal').modal('hide');
+  $('.modal-backdrop').remove();
 
   $.getJSON(path, {modal_window: "withdraw", pool_hash: id})
     .done(function(response) {
@@ -66,9 +70,38 @@ window.openWithdrawModal = function(id) {
     })
 }
 
+window.openQuestionModal = function(id) {
+  const modal = "#questionStatusModal";
+  $(`${modal} .btn-line.positive`).unbind("click");
+  $(`${modal} .btn-line.positive`).click(() => openWithdrawModal(id));
+  $(`${modal} .btn-line.negative`).unbind("click");
+  $(`${modal} .btn-line.negative`).click(() => openClaimModal(id));
+  $(modal).modal();
+}
+
+window.openClaimModal = function(id) {
+  const el = $("#stakesModalWindows");
+  const path = el.attr("current_path");
+  $('.modal').modal('hide');
+  $('.modal-backdrop').remove();
+
+  $.getJSON(path, {modal_window: "claim", pool_hash: id})
+    .done(function(response) {
+      el.html(response.window);
+
+      const modal = '#claimModal';
+      const progress = parseInt($(`${modal} .js-stakes-progress-data-progress`).text())
+      const total = parseInt($(`${modal} .js-stakes-progress-data-total`).text())
+
+      $(modal).modal()
+
+      setupStakesProgress(progress, total, $(`${modal} .js-stakes-progress`))
+    })
+}
+
 window.openMoveStakeModal = function(id) {
-  var el = $("#stakesModalWindows");
-  var path = el.attr("current_path");
+  const el = $("#stakesModalWindows");
+  const path = el.attr("current_path");
 
   $.getJSON(path, {modal_window: "move_stake", pool_hash: id})
     .done(function(response) {
@@ -85,8 +118,8 @@ window.openMoveStakeModal = function(id) {
 }
 
 window.selectedStakeMovePool = function(from_hash, to_hash) {
-  var el = $("#stakesModalWindows");
-  var path = el.attr("current_path");
+  const el = $("#stakesModalWindows");
+  const path = el.attr("current_path");
   $('.modal').modal('hide');
   $('.modal-backdrop').remove();
 

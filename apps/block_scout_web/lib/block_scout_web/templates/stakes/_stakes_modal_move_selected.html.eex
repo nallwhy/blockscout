@@ -23,7 +23,7 @@
                   <div class="input-group-text">POA20</div>
                 </div>
               </div>
-              <p class="form-p m-b-0">You Staked: <span class="text-dark"><%= 0 %> POA20</span></p>
+              <p class="form-p m-b-0">You Staked: <span class="text-dark"><%= format_wei_value(@staked, :ether) %></span></p>
               <div class="input-group form-group">
                 <%= 
                   select(

@@ -4,7 +4,7 @@ defmodule BlockScoutWeb.PoolsController do
   alias Explorer.Counters.AverageBlockTime
   alias Explorer.Chain
   alias Explorer.Chain.Wei
-  alias BlockScoutWeb.{PoolsView, StakesView}
+  alias BlockScoutWeb.{PoolsView, StakesView, CommonComponentsView}
   alias Explorer.Staking.EpochCounter
   alias Explorer.Chain.BlockNumberCache
 
@@ -28,7 +28,7 @@ defmodule BlockScoutWeb.PoolsController do
     window =
       pool_hash
       |> Chain.staking_pool()
-      |> render_modal(window_name, params)
+      |> render_modal(window_name, params, conn)
 
     json(conn, %{window: window})
   end
@@ -194,7 +194,7 @@ defmodule BlockScoutWeb.PoolsController do
     inactive_pools_path(conn, :inactive_pools, params)
   end
 
-  defp render_modal(pool, "info", _params) do
+  defp render_modal(pool, "info", _params, _conn) do
     Phoenix.View.render_to_string(
       StakesView,
       "_stakes_modal_validator_info.html",
@@ -202,67 +202,140 @@ defmodule BlockScoutWeb.PoolsController do
     )
   end
 
-  defp render_modal(pool, "make_stake", _params) do
-    Phoenix.View.render_to_string(
-      StakesView,
-      "_stakes_modal_stake.html",
-      pool: pool
-    )
+  defp render_modal(pool, "make_stake", _params, conn) do
+    delegator = gelegator_info(conn)
+
+    if delegator do
+      Phoenix.View.render_to_string(
+        StakesView,
+        "_stakes_modal_stake.html",
+        pool: pool,
+        balance: delegator[:balance]
+      )
+    else
+      Phoenix.View.render_to_string(
+        CommonComponentsView,
+        "_modal_status.html",
+        status: "error",
+        title: "Unauthorized"
+      )
+    end
   end
 
-  defp render_modal(pool, "withdraw", _params) do
-    Phoenix.View.render_to_string(
-      StakesView,
-      "_stakes_modal_withdraw.html",
-      pool: pool
-    )
+  defp render_modal(pool, "withdraw", _params, conn) do
+    with address when is_binary(address) <- get_session(conn, :address_hash),
+      delegator when is_map(delegator) <- Chain.staking_delegator(address, pool.staking_address_hash)
+    do
+      Phoenix.View.render_to_string(
+        StakesView,
+        "_stakes_modal_withdraw.html",
+        pool: pool,
+        accesses: get_accesses(delegator),
+        staked: delegator.stake_amount
+      )
+    else
+      _ ->
+        Phoenix.View.render_to_string(
+          CommonComponentsView,
+          "_modal_status.html",
+          status: "error",
+          title: "Unauthorized"
+        )
+    end
   end
 
-  defp render_modal(%{staking_address_hash: address} = pool, "move_stake", _params) do
-    pools =
-      :active
-      |> Chain.staking_pools()
-      |> Enum.filter(&(&1.staking_address_hash != address))
-      |> Enum.map(fn %{staking_address_hash: hash} ->
-        string_hash = to_string(hash)
-        [
-          key: binary_part(string_hash, 0, 13),
-          value: string_hash
-        ]
-      end)
-
-    Phoenix.View.render_to_string(
-      StakesView,
-      "_stakes_modal_move.html",
-      pool: pool,
-      pools: pools
-    )
+  defp render_modal(pool, "claim", _params, conn) do
+    with address when is_binary(address) <- get_session(conn, :address_hash),
+      delegator when is_map(delegator) <- Chain.staking_delegator(address, pool.staking_address_hash)
+    do
+      Phoenix.View.render_to_string(
+        StakesView,
+        "_stakes_modal_claim.html",
+        pool: pool,
+        ordered_amount: delegator.ordered_withdraw
+      )
+    else
+      _ ->
+        Phoenix.View.render_to_string(
+          CommonComponentsView,
+          "_modal_status.html",
+          status: "error",
+          title: "Unauthorized"
+        )
+    end
   end
 
-  defp render_modal(%{staking_address_hash: address} = pool, "move_selected", params) do
-    pools =
-      :active
-      |> Chain.staking_pools()
-      |> Enum.filter(&(&1.staking_address_hash != address))
-      |> Enum.map(fn %{staking_address_hash: hash} ->
-        string_hash = to_string(hash)
-        [
-          key: binary_part(string_hash, 0, 13),
-          value: string_hash
-        ]
-      end)
+  defp render_modal(%{staking_address_hash: pool_address} = pool, "move_stake", _params, conn) do
+    with address when is_binary(address) <- get_session(conn, :address_hash),
+      delegator when is_map(delegator) <- Chain.staking_delegator(address, pool_address)
+    do
+      pools =
+        :active
+        |> Chain.staking_pools()
+        |> Enum.filter(&(&1.staking_address_hash != pool_address))
+        |> Enum.map(fn %{staking_address_hash: hash} ->
+          string_hash = to_string(hash)
+          [
+            key: binary_part(string_hash, 0, 13),
+            value: string_hash
+          ]
+        end)
 
-    pool_to =
-      params
-      |> Map.get("pool_to")
-      |> Chain.staking_pool()
+      Phoenix.View.render_to_string(
+        StakesView,
+        "_stakes_modal_move.html",
+        pool: pool,
+        pools: pools,
+        staked: delegator.stake_amount
+      )
+    else
+      _ ->
+        Phoenix.View.render_to_string(
+          CommonComponentsView,
+          "_modal_status.html",
+          status: "error",
+          title: "Unauthorized"
+        )
+    end
+  end
 
-    Phoenix.View.render_to_string(
-      StakesView,
-      "_stakes_modal_move_selected.html",
-      pool_from: pool,
-      pool_to: pool_to,
-      pools: pools
-    )
+  defp render_modal(%{staking_address_hash: pool_address} = pool, "move_selected", params, conn) do
+    with address when is_binary(address) <- get_session(conn, :address_hash),
+      delegator when is_map(delegator) <- Chain.staking_delegator(address, pool_address)
+    do
+      pools =
+        :active
+        |> Chain.staking_pools()
+        |> Enum.filter(&(&1.staking_address_hash != pool_address))
+        |> Enum.map(fn %{staking_address_hash: hash} ->
+          string_hash = to_string(hash)
+          [
+            key: binary_part(string_hash, 0, 13),
+            value: string_hash
+          ]
+        end)
+
+      pool_to =
+        params
+        |> Map.get("pool_to")
+        |> Chain.staking_pool()
+
+      Phoenix.View.render_to_string(
+        StakesView,
+        "_stakes_modal_move_selected.html",
+        pool_from: pool,
+        pool_to: pool_to,
+        pools: pools,
+        staked: delegator.stake_amount
+      )
+    else
+      _ ->
+        Phoenix.View.render_to_string(
+          CommonComponentsView,
+          "_modal_status.html",
+          status: "error",
+          title: "Unauthorized"
+        )
+    end
   end
 end

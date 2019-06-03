@@ -3,19 +3,20 @@ import Chart from 'chart.js'
 
 $(function () {
   $('.js-become-candidate').on('click', function () {
-    $('#becomeCandidateModal').modal()
-  })
-
-  $('.js-move-stake').on('click', function () {
-    $('#errorStatusModal').modal()
+    const el = $('#becomeCandidateModal');
+    if(el.length) {
+      el.modal();
+    }
+    else {
+      const modal = '#warningStatusModal';
+      $(`${modal} .modal-status-title`).text('Unauthorized');
+      $(`${modal} .modal-status-text`).text('Please login with MetaMask');
+      $(modal).modal();
+    }
   })
 
   $('.js-remove-pool').on('click', function () {
     $('#warningStatusModal').modal()
-  })
-
-  $('.js-copy-address').on('click', function () {
-    $('#successStatusModal').modal()
   })
 })
 

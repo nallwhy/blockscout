@@ -6,7 +6,8 @@
   epoch_end_in: @epoch_end_in,
   block_number: @block_number,
   user: @user,
-  logged_in: @logged_in
+  logged_in: @logged_in,
+  min_candidate_stake: @min_candidate_stake
 %>
 <section data-page="stakes" class="container" data-user-address=<%= if @user, do: @user.address %>>
   <div class="card" data-async-load data-async-listing="<%= @current_path %>">

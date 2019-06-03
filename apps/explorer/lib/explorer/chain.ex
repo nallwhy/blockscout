@@ -3042,10 +3042,12 @@ defmodule Explorer.Chain do
     query = from(
       address in Address,
       where: address.hash == ^address,
-      join: delegator in StakingPoolsDelegator,
+      left_join: delegator in StakingPoolsDelegator,
       on: delegator.delegator_address_hash == address.hash,
+      left_join: pool in StakingPool,
+      on: pool.staking_address_hash == address.hash,
       group_by: address.hash,
-      select: [address.fetched_coin_balance, sum(delegator.stake_amount)]
+      select: [address.fetched_coin_balance, sum(delegator.stake_amount), count(pool) > 0]
     )
 
     Repo.one(query)

@@ -119,6 +119,7 @@ defmodule BlockScoutWeb.PoolsController do
     epoch_end_block = EpochCounter.epoch_end_block()
     block_number = BlockNumberCache.max_number()
     user = gelegator_info(conn)
+    stakes_setting = Application.get_env(:block_scout_web, :stakes)
 
     options = [
       pools_type: filter,
@@ -127,7 +128,8 @@ defmodule BlockScoutWeb.PoolsController do
       block_number: block_number,
       current_path: current_path(conn),
       user: user,
-      logged_in: user != nil
+      logged_in: user != nil,
+      min_candidate_stake: stakes_setting[:min_candidate_stake]
     ]
 
     render(conn, "index.html", options)
@@ -137,12 +139,13 @@ defmodule BlockScoutWeb.PoolsController do
     address = get_session(conn, :address_hash)
     if address do
       case Chain.delegator_info(address) do
-        [balance, staked] ->
+        [balance, staked, has_pool] ->
           {:ok, staked_wei} = Wei.cast(staked)
           %{
             address: address,
             balance: balance,
-            staked: staked_wei
+            staked: staked_wei,
+            has_pool: has_pool
           }
 
         _ ->
@@ -150,7 +153,8 @@ defmodule BlockScoutWeb.PoolsController do
           %{
             address: address,
             balance: zero_wei,
-            staked: zero_wei
+            staked: zero_wei,
+            has_pool: false
           }
       end
     end
@@ -204,13 +208,15 @@ defmodule BlockScoutWeb.PoolsController do
 
   defp render_modal(pool, "make_stake", _params, conn) do
     delegator = gelegator_info(conn)
+    stakes_setting = Application.get_env(:block_scout_web, :stakes)
 
     if delegator do
       Phoenix.View.render_to_string(
         StakesView,
         "_stakes_modal_stake.html",
         pool: pool,
-        balance: delegator[:balance]
+        balance: delegator[:balance],
+        min_stake: stakes_setting[:min_delegator_stake]
       )
     else
       Phoenix.View.render_to_string(

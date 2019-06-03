@@ -33,9 +33,7 @@
     <%= 
       render BlockScoutWeb.PoolsView, 
       "_table.html",
-      pools_type: @pools_type,
-      average_block_time: @average_block_time,
-      current_path: @current_path
+      pools_type: @pools_type
     %>
 
     <div class="card-footer-paging">

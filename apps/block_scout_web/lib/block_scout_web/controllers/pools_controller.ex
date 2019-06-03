@@ -10,6 +10,8 @@ defmodule BlockScoutWeb.PoolsController do
 
   import BlockScoutWeb.Chain, only: [paging_options: 1, next_page_params: 3, split_list_by_page: 1]
 
+  @accesses [:stake, :withdraw, :order_withdraw, :claim]
+
   def validators(conn, params) do
     render_template(:validator, conn, params)
   end
@@ -51,6 +53,7 @@ defmodule BlockScoutWeb.PoolsController do
 
   defp render_template(filter, conn, %{"type" => "JSON"} = params) do
     [paging_options: options] = paging_options(params)
+    user_address = get_session(conn, :address_hash)
 
     last_index =
       params
@@ -58,14 +61,25 @@ defmodule BlockScoutWeb.PoolsController do
       |> String.to_integer()
 
     pools_plus_one =
-      filter
-      |> Chain.staking_pools(options)
+      if user_address do
+        filter
+        |> Chain.staking_pools_with_staker(user_address, options)
+        |> Enum.map(fn {pool, delegator} ->
+          accesses = get_accesses(delegator)
+          Map.put(pool, :accesses, accesses)
+        end)
+      else
+        Chain.staking_pools(filter, options)
+      end
+
+    pools_with_index =
+      pools_plus_one
       |> Enum.with_index(last_index + 1)
       |> Enum.map(fn {pool, index} ->
         Map.put(pool, :position, index)
       end)
 
-    {pools, next_page} = split_list_by_page(pools_plus_one)
+    {pools, next_page} = split_list_by_page(pools_with_index)
 
     next_page_path =
       case next_page_params(next_page, pools, params) do
@@ -86,7 +100,8 @@ defmodule BlockScoutWeb.PoolsController do
           "_rows.html",
           pool: pool,
           average_block_time: average_block_time,
-          pools_type: filter
+          pools_type: filter,
+          accesses: Map.get(pool, :accesses, [])
         )
       end)
 
@@ -100,14 +115,12 @@ defmodule BlockScoutWeb.PoolsController do
   end
 
   defp render_template(filter, conn, _) do
-    average_block_time = AverageBlockTime.average_block_time()
     epoch_number = EpochCounter.epoch_number()
     epoch_end_block = EpochCounter.epoch_end_block()
     block_number = BlockNumberCache.max_number()
     user = gelegator_info(conn)
 
     options = [
-      average_block_time: average_block_time,
       pools_type: filter,
       epoch_number: epoch_number,
       epoch_end_in: epoch_end_block - block_number,
@@ -142,6 +155,32 @@ defmodule BlockScoutWeb.PoolsController do
       end
     end
   end
+
+  defp get_accesses(delegator) do
+    Enum.reduce(@accesses, [], fn access, acc ->
+      if check_access(delegator, access) do
+        [access | acc]
+      else
+        acc
+      end
+    end)
+  end
+
+  defp check_access(%{max_withdraw_allowed: max}, :withdraw) do
+    Decimal.to_float(max.value) > 0
+  end
+
+  defp check_access(%{max_ordered_withdraw_allowed: max}, :order_withdraw) do
+    Decimal.to_float(max.value) > 0
+  end
+
+  defp check_access(%{ordered_withdraw: amount, ordered_withdraw_epoch: epoch}, :claim) do
+    Decimal.to_float(amount.value) > 0 && epoch < EpochCounter.epoch_number()
+  end
+
+  defp check_access(_, :stake), do: true
+
+  defp check_access(_, _), do: false
 
   defp next_page_path(:validator, conn, params) do
     validators_path(conn, :validators, params)

@@ -1,11 +1,26 @@
 import $ from 'jquery'
 import Chart from 'chart.js'
+import {store} from '../pages/stakes.js'
 
 $(function () {
   $('.js-become-candidate').on('click', function () {
-    const el = $('#becomeCandidateModal');
-    if(el.length) {
-      el.modal();
+    const el = '#becomeCandidateModal';
+    if($(el).length) {
+      $(`${el} form`).unbind("submit")
+      $(`${el} form`).submit(() => {
+        const stake = $(`${el} [candidate-stake]`).val();
+        const address = $(`${el} [mining-address]`).val();
+        const contract = store.getState().stakingContract;
+        const account = store.getState().account;
+        contract.methods.addPool(stake, address).send({
+          from: account, 
+          gas: 400000, 
+          gasPrice: 1000000000
+        })
+        $(el).modal("hide");
+        return false
+      })
+      $(el).modal();
     }
     else {
       const modal = '#warningStatusModal';

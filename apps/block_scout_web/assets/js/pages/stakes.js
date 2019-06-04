@@ -10,7 +10,14 @@ export const initialState = {
 export function reducer (state = initialState, action) {
   switch (action.type) {
     case 'WEB3_DETECTED': {
-      return Object.assign({}, state, { web3: action.web3 })
+      const $el =  $('[data-page="stakes"]');
+      const validatorsContract = new action.web3.eth.Contract($el.data('validators-abi'), $el.data('validators-address'));
+      const stakingContract = new action.web3.eth.Contract($el.data('staking-abi'), $el.data('staking-address'));
+      return Object.assign({}, state, { 
+        web3: action.web3, 
+        validatorsContract: validatorsContract,
+        stakingContract: stakingContract
+      })
     }
     case 'AUTHORIZED': {
       var sessionUserAddress = $('[data-page="stakes"]').data("user-address") || null
@@ -57,13 +64,14 @@ const elements = {
   '[data-async-load]': {
     load($el) {
       return {
-        accountPath: $el.data('async-listing')
+        accountPath: $el.data('async-listing'),
       }
     }
   }
 }
 
-var store;
+export var store;
+
 const $stakesPage = $('[data-page="stakes"]')
 if ($stakesPage.length) {
   store = createStore(reducer)

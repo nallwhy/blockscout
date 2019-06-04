@@ -120,6 +120,10 @@ defmodule BlockScoutWeb.PoolsController do
     block_number = BlockNumberCache.max_number()
     user = gelegator_info(conn)
     stakes_setting = Application.get_env(:block_scout_web, :stakes)
+    staking_address = Explorer.Staking.PoolsReader.get_staking_address()
+    staking_abi = Explorer.Staking.PoolsReader.get_staking_abi()
+    validators_address = Explorer.Staking.PoolsReader.get_validators_address()
+    validators_abi = Explorer.Staking.PoolsReader.get_validators_abi()
 
     options = [
       pools_type: filter,
@@ -129,7 +133,11 @@ defmodule BlockScoutWeb.PoolsController do
       current_path: current_path(conn),
       user: user,
       logged_in: user != nil,
-      min_candidate_stake: stakes_setting[:min_candidate_stake]
+      min_candidate_stake: stakes_setting[:min_candidate_stake],
+      staking_address: staking_address,
+      staking_abi: Poison.encode!(staking_abi),
+      validators_address: validators_address,
+      validators_abi: Poison.encode!(validators_abi)
     ]
 
     render(conn, "index.html", options)
@@ -199,10 +207,13 @@ defmodule BlockScoutWeb.PoolsController do
   end
 
   defp render_modal(pool, "info", _params, _conn) do
+    average_block_time = AverageBlockTime.average_block_time()
+
     Phoenix.View.render_to_string(
       StakesView,
       "_stakes_modal_validator_info.html",
-      validator: pool
+      validator: pool,
+      average_block_time: average_block_time
     )
   end
 

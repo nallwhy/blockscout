@@ -31,7 +31,22 @@ $(function () {
   })
 
   $('.js-remove-pool').on('click', function () {
-    $('#warningStatusModal').modal()
+    const modal = "#questionStatusModal";
+    $(`${modal} .btn-line.positive`).unbind("click");
+    $(`${modal} .btn-line.positive`).click(() => {
+      const contract = store.getState().stakingContract;
+      const account = store.getState().account;
+      contract.methods.removeMyPool().send({
+        from: account, 
+        gas: 400000, 
+        gasPrice: 1000000000
+      })
+    });
+    $(`${modal} .btn-line.negative`).unbind("click");
+    $(`${modal} .btn-line.negative`).click(() => {
+      $(modal).modal("hide");
+    });
+    $(modal).modal();
   })
 })
 

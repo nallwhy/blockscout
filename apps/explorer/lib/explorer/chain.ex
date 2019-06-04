@@ -3045,7 +3045,7 @@ defmodule Explorer.Chain do
       left_join: delegator in StakingPoolsDelegator,
       on: delegator.delegator_address_hash == address.hash,
       left_join: pool in StakingPool,
-      on: pool.staking_address_hash == address.hash,
+      on: pool.staking_address_hash == address.hash and pool.is_active,
       group_by: address.hash,
       select: [address.fetched_coin_balance, sum(delegator.stake_amount), count(pool) > 0]
     )

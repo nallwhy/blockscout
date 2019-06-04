@@ -95,19 +95,24 @@
     "constant": false,
     "inputs": [
       {
-        "name": "_stakingAddress",
+        "name": "_toPoolStakingAddress",
         "type": "address"
       }
     ],
-    "name": "removePool",
+    "name": "stakeNative",
     "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
+    "payable": true,
+    "stateMutability": "payable",
     "type": "function"
   },
   {
     "constant": false,
-    "inputs": [],
+    "inputs": [
+      {
+        "name": "_stakingAddress",
+        "type": "address"
+      }
+    ],
     "name": "removePool",
     "outputs": [],
     "payable": false,
@@ -578,6 +583,20 @@
     "type": "function"
   },
   {
+    "constant": true,
+    "inputs": [],
+    "name": "erc20Restricted",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "constant": false,
     "inputs": [
       {
@@ -687,6 +706,15 @@
     ],
     "payable": false,
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "removeMyPool",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -930,11 +958,21 @@
     "constant": false,
     "inputs": [
       {
-        "name": "_validatorSetContract",
+        "name": "_miningAddress",
         "type": "address"
-      },
+      }
+    ],
+    "name": "addPoolNative",
+    "outputs": [],
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
       {
-        "name": "_erc20TokenContract",
+        "name": "_validatorSetContract",
         "type": "address"
       },
       {
@@ -956,6 +994,10 @@
       {
         "name": "_stakeWithdrawDisallowPeriod",
         "type": "uint256"
+      },
+      {
+        "name": "_erc20Restricted",
+        "type": "bool"
       }
     ],
     "name": "initialize",

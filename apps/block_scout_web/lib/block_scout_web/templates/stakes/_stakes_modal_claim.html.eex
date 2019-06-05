@@ -11,6 +11,7 @@
             <form>
               <p class="form-p">Your ordered amount</p>
               <p class="form-p"><span class="text-dark"><%= format_wei_value(@ordered_amount, :ether) %></span></p>
+              <input name="pool_address" hidden value=<%= to_string(@pool.staking_address_hash) %>>
               <div class="form-buttons">
                 <%= render BlockScoutWeb.StakesView, "_stakes_btn_withdraw.html", text: gettext("Claim the Amount"), extra_class: "full-width" %>
               </div>

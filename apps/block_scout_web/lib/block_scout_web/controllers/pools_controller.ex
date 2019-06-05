@@ -148,7 +148,7 @@ defmodule BlockScoutWeb.PoolsController do
     if address do
       case Chain.delegator_info(address) do
         [balance, staked, has_pool] ->
-          {:ok, staked_wei} = Wei.cast(staked)
+          {:ok, staked_wei} = Wei.cast(staked || 0)
           %{
             address: address,
             balance: balance,
@@ -178,11 +178,11 @@ defmodule BlockScoutWeb.PoolsController do
     end)
   end
 
-  defp check_access(%{max_withdraw_allowed: max}, :withdraw) do
+  defp check_access(%{max_withdraw_allowed: max, is_active: true}, :withdraw) do
     Decimal.to_float(max.value) > 0
   end
 
-  defp check_access(%{max_ordered_withdraw_allowed: max}, :order_withdraw) do
+  defp check_access(%{max_ordered_withdraw_allowed: max, is_active: true}, :order_withdraw) do
     Decimal.to_float(max.value) > 0
   end
 

@@ -66,7 +66,8 @@ defmodule Indexer.Fetcher.StakingPools do
     if failed_list == [] do
       :ok
     else
-      {:retry, failed_list}
+      Logger.error(inspect(failed_list))
+      :ok
     end
   end
 

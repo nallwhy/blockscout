@@ -8,11 +8,11 @@ $(function () {
     if($(el).length) {
       $(`${el} form`).unbind("submit")
       $(`${el} form`).submit(() => {
-        const stake = $(`${el} [candidate-stake]`).val();
+        const stake = parseInt($(`${el} [candidate-stake]`).val());
         const address = $(`${el} [mining-address]`).val();
         const contract = store.getState().stakingContract;
         const account = store.getState().account;
-        contract.methods.addPool(stake, address).send({
+        contract.methods.addPool(stake * Math.pow(10, 18), address).send({
           from: account, 
           gas: 400000, 
           gasPrice: 1000000000
@@ -75,7 +75,21 @@ window.openStakeModal = function(id) {
       const progress = parseInt($(`${modal} .js-stakes-progress-data-progress`).text())
       const total = parseInt($(`${modal} .js-stakes-progress-data-total`).text())
 
-      $(modal).modal()
+      $(`${modal} form`).unbind("submit")
+      $(`${modal} form`).submit(() => {
+        const stake = $(`${modal} [name="amount"]`).val();
+        const pool_address = $(`${modal} [name="pool_address"]`).val();
+        const contract = store.getState().stakingContract;
+        const account = store.getState().account;
+        contract.methods.stake(pool_address, stake * Math.pow(10, 18)).send({
+          from: account, 
+          gas: 400000, 
+          gasPrice: 1000000000
+        })
+        $(modal).modal("hide");
+        return false
+      })
+      $(modal).modal();
 
       setupStakesProgress(progress, total, $(`${modal} .js-stakes-progress`))
     })
@@ -94,6 +108,35 @@ window.openWithdrawModal = function(id) {
       const modal = '#withdrawModal';
       const progress = parseInt($(`${modal} .js-stakes-progress-data-progress`).text())
       const total = parseInt($(`${modal} .js-stakes-progress-data-total`).text())
+
+      $(`${modal} form`).unbind("submit")
+      $(`${modal} form`).submit(() => {return false;})
+
+      $(`${modal} .withdraw`).click(() => {
+        const stake = $(`${modal} [name="amount"]`).val();
+        const pool_address = $(`${modal} [name="pool_address"]`).val();
+        const contract = store.getState().stakingContract;
+        const account = store.getState().account;
+        contract.methods.withdraw(pool_address, stake * Math.pow(10, 18)).send({
+          from: account, 
+          gas: 400000, 
+          gasPrice: 1000000000
+        })
+        $(modal).modal("hide");
+      })
+
+      $(`${modal} .order_withdraw`).click(() => {
+        const stake = $(`${modal} [name="amount"]`).val();
+        const pool_address = $(`${modal} [name="pool_address"]`).val();
+        const contract = store.getState().stakingContract;
+        const account = store.getState().account;
+        contract.methods.orderWithdraw(pool_address, stake * Math.pow(10, 18)).send({
+          from: account, 
+          gas: 400000, 
+          gasPrice: 1000000000
+        })
+        $(modal).modal("hide");
+      })
 
       $(modal).modal()
 
@@ -124,6 +167,19 @@ window.openClaimModal = function(id) {
       const progress = parseInt($(`${modal} .js-stakes-progress-data-progress`).text())
       const total = parseInt($(`${modal} .js-stakes-progress-data-total`).text())
 
+      $(`${modal} form`).unbind("submit")
+      $(`${modal} form`).submit(() => {
+        const pool_address = $(`${modal} [name="pool_address"]`).val();
+        const contract = store.getState().stakingContract;
+        const account = store.getState().account;
+        contract.methods.claimOrderedWithdraw(pool_address).send({
+          from: account, 
+          gas: 400000, 
+          gasPrice: 1000000000
+        })
+        $(modal).modal("hide");
+        return false
+      })
       $(modal).modal()
 
       setupStakesProgress(progress, total, $(`${modal} .js-stakes-progress`))
@@ -165,7 +221,22 @@ window.selectedStakeMovePool = function(from_hash, to_hash) {
       var progress_to = parseInt($(`${modal} .js-stakes-progress-data-progress.js-pool-to-progress`).text())
       var total_to = parseInt($(`${modal} .js-stakes-progress-data-total.js-pool-to-progress`).text())  
 
-      $(modal).modal();
+      $(`${modal} form`).unbind("submit")
+      $(`${modal} form`).submit(() => {
+        const pool_from = $(`${modal} [name="pool_from"]`).val();
+        const pool_to = $(`${modal} [name="pool_to"]`).val();
+        const stake = $(`${modal} [name="amount"]`).val();
+        const contract = store.getState().stakingContract;
+        const account = store.getState().account;
+        contract.methods.moveStake(pool_from, pool_to, stake * Math.pow(10, 18)).send({
+          from: account, 
+          gas: 400000, 
+          gasPrice: 1000000000
+        })
+        $(modal).modal("hide");
+        return false
+      })
+      $(modal).modal()
 
       setupStakesProgress(progress_from, total_from, $(`${modal} .js-pool-from-progress`))
       setupStakesProgress(progress_to, total_to, $(`${modal} .js-pool-to-progress`))

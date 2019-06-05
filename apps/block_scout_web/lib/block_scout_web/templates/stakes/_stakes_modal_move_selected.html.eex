@@ -17,8 +17,10 @@
           </div>
           <div class="modal-body">
             <form>
+              <input name="pool_from" hidden value=<%= @pool_from.staking_address_hash %>>
+              <input name="pool_to"   hidden value=<%= @pool_to.staking_address_hash %>>
               <div class="input-group form-group">
-                <input type="text" class="form-control n-b-r" placeholder='<%= gettext("Amount") %>'>
+                <input name="amount" type="text" class="form-control n-b-r" placeholder='<%= gettext("Amount") %>'>
                 <div class="input-group-prepend last">
                   <div class="input-group-text">POA20</div>
                 </div>

@@ -10,15 +10,16 @@
           <div class="modal-body">
             <form>
               <div class="input-group form-group">
-                <input type="text" class="form-control n-b-r" placeholder='<%= gettext("Amount") %>'>
+                <input name="amount" type="text" class="form-control n-b-r" placeholder='<%= gettext("Amount") %>'>
                 <div class="input-group-prepend last">
                   <div class="input-group-text">POA20</div>
                 </div>
+                <input name="pool_address" hidden value=<%= to_string(@pool.staking_address_hash) %>>
               </div>
               <p class="form-p">Your Staked: <span class="text-dark"><%= format_wei_value(@staked, :ether) %></span></p>
               <div class="form-buttons">
-                <%= render BlockScoutWeb.StakesView, "_stakes_btn_withdraw.html", text: gettext("Withdraw Now"), extra_class: "full-width", disabled: :withdraw not in @accesses %>
-                <%= render BlockScoutWeb.StakesView, "_stakes_btn_withdraw.html", text: gettext("Order Withdrawal"), extra_class: "full-width", disabled: :order_withdraw not in @accesses %>
+                <%= render BlockScoutWeb.StakesView, "_stakes_btn_withdraw.html", text: gettext("Withdraw Now"), extra_class: "full-width withdraw", disabled: :withdraw not in @accesses %>
+                <%= render BlockScoutWeb.StakesView, "_stakes_btn_withdraw.html", text: gettext("Order Withdrawal"), extra_class: "full-width order_withdraw", disabled: :order_withdraw not in @accesses %>
               </div>
             </form>
           </div>

@@ -3043,7 +3043,7 @@ defmodule Explorer.Chain do
       address in Address,
       where: address.hash == ^address,
       left_join: delegator in StakingPoolsDelegator,
-      on: delegator.delegator_address_hash == address.hash,
+      on: delegator.delegator_address_hash == address.hash and delegator.is_active,
       left_join: pool in StakingPool,
       on: pool.staking_address_hash == address.hash and pool.is_active,
       group_by: address.hash,

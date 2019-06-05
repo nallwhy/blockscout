@@ -42,7 +42,7 @@
             render BlockScoutWeb.StakesView, 
             "_stakes_control_withdraw.html", 
             address: @pool.staking_address_hash, 
-            claim: :claim in @accesses 
+            claim: :claim in @accesses
           %>
         <% end %>
         <%= if :stake in @accesses do %>

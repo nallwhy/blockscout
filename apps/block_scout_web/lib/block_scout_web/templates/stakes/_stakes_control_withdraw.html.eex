@@ -1,5 +1,5 @@
 <span class="stakes-control" onclick=
-  <%= if @claim do %>
+  <%= if not @claim do %>
     "openWithdrawModal('<%= to_string(@address) %>')"
   <% else %>
     "openQuestionModal('<%= to_string(@address) %>')"

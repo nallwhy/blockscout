@@ -1,4 +1,7 @@
 defmodule BlockScoutWeb.StakesHelpers do
+  @moduledoc """
+  Helpers for staking templates
+  """
   alias Explorer.Chain.{BlockNumberCache, Wei}
   alias Timex.Duration
 

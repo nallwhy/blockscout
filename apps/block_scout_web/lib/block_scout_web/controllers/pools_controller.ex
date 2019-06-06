@@ -1,12 +1,12 @@
 defmodule BlockScoutWeb.PoolsController do
   use BlockScoutWeb, :controller
 
-  alias Explorer.Counters.AverageBlockTime
   alias Explorer.Chain
-  alias Explorer.Chain.Wei
-  alias BlockScoutWeb.{PoolsView, StakesView, CommonComponentsView}
+  alias Explorer.Chain.{BlockNumberCache, Wei}
+  alias Explorer.Counters.AverageBlockTime
+  alias BlockScoutWeb.{CommonComponentsView, PoolsView, StakesView}
   alias Explorer.Staking.EpochCounter
-  alias Explorer.Chain.BlockNumberCache
+  alias Phoenix.View
 
   import BlockScoutWeb.Chain, only: [paging_options: 1, next_page_params: 3, split_list_by_page: 1]
 
@@ -95,7 +95,7 @@ defmodule BlockScoutWeb.PoolsController do
     items =
       pools
       |> Enum.map(fn pool ->
-        Phoenix.View.render_to_string(
+        View.render_to_string(
           PoolsView,
           "_rows.html",
           pool: pool,
@@ -212,7 +212,7 @@ defmodule BlockScoutWeb.PoolsController do
   defp render_modal(pool, "info", _params, _conn) do
     average_block_time = AverageBlockTime.average_block_time()
 
-    Phoenix.View.render_to_string(
+    View.render_to_string(
       StakesView,
       "_stakes_modal_validator_info.html",
       validator: pool,
@@ -225,7 +225,7 @@ defmodule BlockScoutWeb.PoolsController do
     stakes_setting = Application.get_env(:block_scout_web, :stakes)
 
     if delegator do
-      Phoenix.View.render_to_string(
+      View.render_to_string(
         StakesView,
         "_stakes_modal_stake.html",
         pool: pool,
@@ -233,7 +233,7 @@ defmodule BlockScoutWeb.PoolsController do
         min_stake: stakes_setting[:min_delegator_stake]
       )
     else
-      Phoenix.View.render_to_string(
+      View.render_to_string(
         CommonComponentsView,
         "_modal_status.html",
         status: "error",
@@ -245,7 +245,7 @@ defmodule BlockScoutWeb.PoolsController do
   defp render_modal(pool, "withdraw", _params, conn) do
     with address when is_binary(address) <- get_session(conn, :address_hash),
          delegator when is_map(delegator) <- Chain.staking_delegator(address, pool.staking_address_hash) do
-      Phoenix.View.render_to_string(
+      View.render_to_string(
         StakesView,
         "_stakes_modal_withdraw.html",
         pool: pool,
@@ -254,7 +254,7 @@ defmodule BlockScoutWeb.PoolsController do
       )
     else
       _ ->
-        Phoenix.View.render_to_string(
+        View.render_to_string(
           CommonComponentsView,
           "_modal_status.html",
           status: "error",
@@ -266,7 +266,7 @@ defmodule BlockScoutWeb.PoolsController do
   defp render_modal(pool, "claim", _params, conn) do
     with address when is_binary(address) <- get_session(conn, :address_hash),
          delegator when is_map(delegator) <- Chain.staking_delegator(address, pool.staking_address_hash) do
-      Phoenix.View.render_to_string(
+      View.render_to_string(
         StakesView,
         "_stakes_modal_claim.html",
         pool: pool,
@@ -274,7 +274,7 @@ defmodule BlockScoutWeb.PoolsController do
       )
     else
       _ ->
-        Phoenix.View.render_to_string(
+        View.render_to_string(
           CommonComponentsView,
           "_modal_status.html",
           status: "error",
@@ -299,7 +299,7 @@ defmodule BlockScoutWeb.PoolsController do
           ]
         end)
 
-      Phoenix.View.render_to_string(
+      View.render_to_string(
         StakesView,
         "_stakes_modal_move.html",
         pool: pool,
@@ -308,7 +308,7 @@ defmodule BlockScoutWeb.PoolsController do
       )
     else
       _ ->
-        Phoenix.View.render_to_string(
+        View.render_to_string(
           CommonComponentsView,
           "_modal_status.html",
           status: "error",
@@ -338,7 +338,7 @@ defmodule BlockScoutWeb.PoolsController do
         |> Map.get("pool_to")
         |> Chain.staking_pool()
 
-      Phoenix.View.render_to_string(
+      View.render_to_string(
         StakesView,
         "_stakes_modal_move_selected.html",
         pool_from: pool,
@@ -348,7 +348,7 @@ defmodule BlockScoutWeb.PoolsController do
       )
     else
       _ ->
-        Phoenix.View.render_to_string(
+        View.render_to_string(
           CommonComponentsView,
           "_modal_status.html",
           status: "error",

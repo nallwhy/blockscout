@@ -23,8 +23,8 @@ defmodule BlockScoutWeb.Chain do
     Address.CurrentTokenBalance,
     Block,
     InternalTransaction,
-    StakingPool,
     Log,
+    StakingPool,
     TokenTransfer,
     Transaction,
     Wei

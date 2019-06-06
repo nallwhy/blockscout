@@ -2933,7 +2933,11 @@ defmodule Explorer.Chain do
   end
 
   @doc "Get staking pools from the DB with user's stake information"
-  @spec staking_pools_with_staker(filter :: :validator | :active | :inactive, user_address :: String.t(), options :: PagingOptions.t()) :: [{map(), map() | nil}]
+  @spec staking_pools_with_staker(
+          filter :: :validator | :active | :inactive,
+          user_address :: String.t(),
+          options :: PagingOptions.t()
+        ) :: [{map(), map() | nil}]
   def staking_pools_with_staker(filter, user_address, paging_options \\ @default_paging_options) do
     base_query = staking_pools_query(filter, paging_options)
 
@@ -2941,8 +2945,9 @@ defmodule Explorer.Chain do
       from(
         pool in base_query,
         left_join: d in StakingPoolsDelegator,
-        on: d.pool_address_hash == pool.staking_address_hash
-          and d.delegator_address_hash == ^user_address,
+        on:
+          d.pool_address_hash == pool.staking_address_hash and
+            d.delegator_address_hash == ^user_address,
         select: {pool, d}
       )
 
@@ -2972,7 +2977,7 @@ defmodule Explorer.Chain do
           base_query,
           [p],
           p.staked_ratio < ^value or
-          (p.staked_ratio == ^value and p.staking_address_hash > ^address_hash)
+            (p.staked_ratio == ^value and p.staking_address_hash > ^address_hash)
         )
 
       _ ->
@@ -3019,10 +3024,11 @@ defmodule Explorer.Chain do
   defp staking_pool_filter(query, _), do: query
 
   def staking_pool(hash) do
-    query = from(
-      pool in StakingPool,
-      where: pool.staking_address_hash == ^hash
-    )
+    query =
+      from(
+        pool in StakingPool,
+        where: pool.staking_address_hash == ^hash
+      )
 
     Repo.one(query)
   end
@@ -3039,16 +3045,17 @@ defmodule Explorer.Chain do
   end
 
   def delegator_info(address) do
-    query = from(
-      address in Address,
-      where: address.hash == ^address,
-      left_join: delegator in StakingPoolsDelegator,
-      on: delegator.delegator_address_hash == address.hash and delegator.is_active,
-      left_join: pool in StakingPool,
-      on: pool.staking_address_hash == address.hash and pool.is_active,
-      group_by: address.hash,
-      select: [address.fetched_coin_balance, sum(delegator.stake_amount), count(pool) > 0]
-    )
+    query =
+      from(
+        address in Address,
+        where: address.hash == ^address,
+        left_join: delegator in StakingPoolsDelegator,
+        on: delegator.delegator_address_hash == address.hash and delegator.is_active,
+        left_join: pool in StakingPool,
+        on: pool.staking_address_hash == address.hash and pool.is_active,
+        group_by: address.hash,
+        select: [address.fetched_coin_balance, sum(delegator.stake_amount), count(pool) > 0]
+      )
 
     Repo.one(query)
   end

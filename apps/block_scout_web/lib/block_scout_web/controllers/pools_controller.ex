@@ -145,10 +145,12 @@ defmodule BlockScoutWeb.PoolsController do
 
   defp gelegator_info(conn) do
     address = get_session(conn, :address_hash)
+
     if address do
       case Chain.delegator_info(address) do
         [balance, staked, has_pool] ->
           {:ok, staked_wei} = Wei.cast(staked || 0)
+
           %{
             address: address,
             balance: balance,
@@ -158,6 +160,7 @@ defmodule BlockScoutWeb.PoolsController do
 
         _ ->
           {:ok, zero_wei} = Wei.cast(0)
+
           %{
             address: address,
             balance: zero_wei,
@@ -241,8 +244,7 @@ defmodule BlockScoutWeb.PoolsController do
 
   defp render_modal(pool, "withdraw", _params, conn) do
     with address when is_binary(address) <- get_session(conn, :address_hash),
-      delegator when is_map(delegator) <- Chain.staking_delegator(address, pool.staking_address_hash)
-    do
+         delegator when is_map(delegator) <- Chain.staking_delegator(address, pool.staking_address_hash) do
       Phoenix.View.render_to_string(
         StakesView,
         "_stakes_modal_withdraw.html",
@@ -263,8 +265,7 @@ defmodule BlockScoutWeb.PoolsController do
 
   defp render_modal(pool, "claim", _params, conn) do
     with address when is_binary(address) <- get_session(conn, :address_hash),
-      delegator when is_map(delegator) <- Chain.staking_delegator(address, pool.staking_address_hash)
-    do
+         delegator when is_map(delegator) <- Chain.staking_delegator(address, pool.staking_address_hash) do
       Phoenix.View.render_to_string(
         StakesView,
         "_stakes_modal_claim.html",
@@ -284,14 +285,14 @@ defmodule BlockScoutWeb.PoolsController do
 
   defp render_modal(%{staking_address_hash: pool_address} = pool, "move_stake", _params, conn) do
     with address when is_binary(address) <- get_session(conn, :address_hash),
-      delegator when is_map(delegator) <- Chain.staking_delegator(address, pool_address)
-    do
+         delegator when is_map(delegator) <- Chain.staking_delegator(address, pool_address) do
       pools =
         :active
         |> Chain.staking_pools()
         |> Enum.filter(&(&1.staking_address_hash != pool_address))
         |> Enum.map(fn %{staking_address_hash: hash} ->
           string_hash = to_string(hash)
+
           [
             key: binary_part(string_hash, 0, 13),
             value: string_hash
@@ -318,14 +319,14 @@ defmodule BlockScoutWeb.PoolsController do
 
   defp render_modal(%{staking_address_hash: pool_address} = pool, "move_selected", params, conn) do
     with address when is_binary(address) <- get_session(conn, :address_hash),
-      delegator when is_map(delegator) <- Chain.staking_delegator(address, pool_address)
-    do
+         delegator when is_map(delegator) <- Chain.staking_delegator(address, pool_address) do
       pools =
         :active
         |> Chain.staking_pools()
         |> Enum.filter(&(&1.staking_address_hash != pool_address))
         |> Enum.map(fn %{staking_address_hash: hash} ->
           string_hash = to_string(hash)
+
           [
             key: binary_part(string_hash, 0, 13),
             value: string_hash

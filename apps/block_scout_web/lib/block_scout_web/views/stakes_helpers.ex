@@ -18,6 +18,7 @@ defmodule BlockScoutWeb.StakesHelpers do
 
   def estimated_unban_day(banned_until, average_block_time) do
     block_time = Duration.to_seconds(average_block_time)
+
     try do
       during_sec = (banned_until - BlockNumberCache.max_number()) * block_time
       now = DateTime.utc_now() |> DateTime.to_unix()

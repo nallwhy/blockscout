@@ -5,7 +5,7 @@ defmodule BlockScoutWeb.PoolsController do
   alias Explorer.Chain.{BlockNumberCache, Wei}
   alias Explorer.Counters.AverageBlockTime
   alias BlockScoutWeb.{CommonComponentsView, PoolsView, StakesView}
-  alias Explorer.Staking.EpochCounter
+  alias Explorer.Staking.{EpochCounter, PoolsReader}
   alias Phoenix.View
 
   import BlockScoutWeb.Chain, only: [paging_options: 1, next_page_params: 3, split_list_by_page: 1]
@@ -120,10 +120,10 @@ defmodule BlockScoutWeb.PoolsController do
     block_number = BlockNumberCache.max_number()
     user = gelegator_info(conn)
     stakes_setting = Application.get_env(:block_scout_web, :stakes)
-    staking_address = Explorer.Staking.PoolsReader.get_staking_address()
-    staking_abi = Explorer.Staking.PoolsReader.get_staking_abi()
-    validators_address = Explorer.Staking.PoolsReader.get_validators_address()
-    validators_abi = Explorer.Staking.PoolsReader.get_validators_abi()
+    staking_address = PoolsReader.get_staking_address()
+    staking_abi = PoolsReader.get_staking_abi()
+    validators_address = PoolsReader.get_validators_address()
+    validators_abi = PoolsReader.get_validators_abi()
 
     options = [
       pools_type: filter,

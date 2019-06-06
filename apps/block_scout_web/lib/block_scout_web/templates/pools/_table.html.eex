@@ -57,3 +57,10 @@
   title: "Lorem Ipsum",
   text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."
 %>
+<%=
+  render BlockScoutWeb.CommonComponentsView,
+  "_modal_status.html",
+  status: "question",
+  title: "Remove my Pool",
+  text: "Do you really want to remove your pool?"
+%>

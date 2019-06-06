@@ -32,8 +32,8 @@ $(function () {
 
   $('.js-remove-pool').on('click', function () {
     const modal = "#questionStatusModal";
-    $(`${modal} .btn-line.positive`).unbind("click");
-    $(`${modal} .btn-line.positive`).click(() => {
+    $(`${modal} .btn-line.accept`).unbind("click");
+    $(`${modal} .btn-line.accept`).click(() => {
       const contract = store.getState().stakingContract;
       const account = store.getState().account;
       contract.methods.removeMyPool().send({
@@ -42,8 +42,8 @@ $(function () {
         gasPrice: 1000000000
       })
     });
-    $(`${modal} .btn-line.negative`).unbind("click");
-    $(`${modal} .btn-line.negative`).click(() => {
+    $(`${modal} .btn-line.except`).unbind("click");
+    $(`${modal} .btn-line.except`).click(() => {
       $(modal).modal("hide");
     });
     $(modal).modal();
@@ -145,11 +145,11 @@ window.openWithdrawModal = function(id) {
 }
 
 window.openQuestionModal = function(id) {
-  const modal = "#questionStatusModal";
-  $(`${modal} .btn-line.positive`).unbind("click");
-  $(`${modal} .btn-line.positive`).click(() => openWithdrawModal(id));
-  $(`${modal} .btn-line.negative`).unbind("click");
-  $(`${modal} .btn-line.negative`).click(() => openClaimModal(id));
+  const modal = "#claimQuestion";
+  $(`${modal} .btn-line.accept`).unbind("click");
+  $(`${modal} .btn-line.accept`).click(() => openWithdrawModal(id));
+  $(`${modal} .btn-line.except`).unbind("click");
+  $(`${modal} .btn-line.except`).click(() => openClaimModal(id));
   $(modal).modal();
 }
 

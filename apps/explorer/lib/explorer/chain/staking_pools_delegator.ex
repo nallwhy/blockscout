@@ -27,7 +27,7 @@ defmodule Explorer.Chain.StakingPoolsDelegator do
   @attrs ~w(
     pool_address_hash delegator_address_hash max_ordered_withdraw_allowed
     max_withdraw_allowed ordered_withdraw stake_amount ordered_withdraw_epoch
-    is_active
+    is_active is_deleted
   )a
 
   @req_attrs ~w(
@@ -42,6 +42,7 @@ defmodule Explorer.Chain.StakingPoolsDelegator do
     field(:ordered_withdraw_epoch, :integer)
     field(:stake_amount, Wei)
     field(:is_active, :boolean, default: true)
+    field(:is_deleted, :boolean, default: false)
 
     belongs_to(
       :staking_pool,

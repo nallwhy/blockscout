@@ -58,7 +58,8 @@ defmodule Explorer.Chain.Import.Runner.StakingPoolsDelegators do
         d in StakingPoolsDelegator,
         update: [
           set: [
-            is_active: false
+            is_active: false,
+            is_deleted: true
           ]
         ]
       )
@@ -108,7 +109,8 @@ defmodule Explorer.Chain.Import.Runner.StakingPoolsDelegators do
           ordered_withdraw_epoch: fragment("EXCLUDED.ordered_withdraw_epoch"),
           inserted_at: fragment("LEAST(?, EXCLUDED.inserted_at)", delegator.inserted_at),
           updated_at: fragment("GREATEST(?, EXCLUDED.updated_at)", delegator.updated_at),
-          is_active: fragment("EXCLUDED.is_active")
+          is_active: fragment("EXCLUDED.is_active"),
+          is_deleted: fragment("EXCLUDED.is_deleted")
         ]
       ]
     )

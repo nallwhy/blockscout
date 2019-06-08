@@ -2947,7 +2947,8 @@ defmodule Explorer.Chain do
         left_join: d in StakingPoolsDelegator,
         on:
           d.pool_address_hash == pool.staking_address_hash and
-            d.delegator_address_hash == ^user_address,
+            d.delegator_address_hash == ^user_address and
+            d.is_deleted == false,
         select: {pool, d}
       )
 

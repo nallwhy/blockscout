@@ -106,6 +106,20 @@
     "type": "function"
   },
   {
+    "constant": true,
+    "inputs": [],
+    "name": "isInitialized",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "constant": false,
     "inputs": [
       {
@@ -225,6 +239,25 @@
       {
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "_poolStakingAddress",
+        "type": "address"
+      }
+    ],
+    "name": "poolDelegatorsInactive",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address[]"
       }
     ],
     "payable": false,
@@ -989,6 +1022,10 @@
       },
       {
         "name": "_stakingEpochDuration",
+        "type": "uint256"
+      },
+      {
+        "name": "_stakingEpochStartBlock",
         "type": "uint256"
       },
       {

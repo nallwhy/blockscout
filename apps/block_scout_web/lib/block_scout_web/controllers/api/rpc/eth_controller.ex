@@ -21,7 +21,18 @@ defmodule BlockScoutWeb.API.RPC.EthController do
   end
 
   def eth_request(conn, request) do
-    [response] = responses([request])
+    # In the case that the JSON body is sent up w/o a json content type,
+    # Phoenix encodes it as a single key value pair, with the value being
+    # nil and the body being the key (as in a CURL request w/ no content type header)
+    decoded_request =
+      with [{single_key, nil}] <- Map.to_list(request),
+           {:ok, decoded} <- Jason.decode(single_key) do
+        decoded
+      else
+        _ -> request
+      end
+
+    [response] = responses([decoded_request])
 
     conn
     |> put_status(200)

@@ -24,6 +24,23 @@ defmodule Explorer.Token.PoolsReaderTest do
         PoolsReader.get_active_pools()
       end
     end
+
+    test "get_inactive_pools success" do
+      get_pools_from_blockchain()
+
+      result = PoolsReader.get_inactive_pools()
+
+      assert Enum.count(result) == 3
+    end
+
+    test "get_pools success" do
+      get_pools_from_blockchain()
+      get_pools_from_blockchain()
+
+      result = PoolsReader.get_pools()
+
+      assert Enum.count(result) == 6
+    end
   end
 
   describe "get_pools_data" do

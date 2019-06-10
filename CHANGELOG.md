@@ -1,6 +1,7 @@
 ## Current
 
 ### Features
+- [#2109](https://github.com/poanetwork/blockscout/pull/2109) - use bigger updates instead of `Multi` transactions in BlocksTransactionsMismatch
 - [#2075](https://github.com/poanetwork/blockscout/pull/2075) - add blocks cache
 
 ### Fixes
@@ -13,6 +14,10 @@
 - [#2096](https://github.com/poanetwork/blockscout/pull/2096) - RSK theme fixes
 - [#2093](https://github.com/poanetwork/blockscout/pull/2093) - detect token transfer type for deprecated erc721 spec
 - [#2108](https://github.com/poanetwork/blockscout/pull/2108) - fixe uncle fetching without full transactions
+- [#2119](https://github.com/poanetwork/blockscout/pull/2119) - fix map logging
+
+### Chore
+- [#2127](https://github.com/poanetwork/blockscout/pull/2127) - use previouse chromedriver version
 
 ### Chore
 

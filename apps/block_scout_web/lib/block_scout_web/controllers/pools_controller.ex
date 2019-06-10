@@ -115,8 +115,8 @@ defmodule BlockScoutWeb.PoolsController do
   end
 
   defp render_template(filter, conn, _) do
-    epoch_number = EpochCounter.epoch_number()
-    epoch_end_block = EpochCounter.epoch_end_block()
+    epoch_number = EpochCounter.epoch_number() || 0
+    epoch_end_block = EpochCounter.epoch_end_block() || 0
     block_number = BlockNumberCache.max_number()
     user = gelegator_info(conn)
     stakes_setting = Application.get_env(:block_scout_web, :stakes)
@@ -190,7 +190,7 @@ defmodule BlockScoutWeb.PoolsController do
   end
 
   defp check_access(%{ordered_withdraw: amount, ordered_withdraw_epoch: epoch}, :claim) do
-    Decimal.to_float(amount.value) > 0 && epoch < EpochCounter.epoch_number()
+    Decimal.to_float(amount.value) > 0 && epoch < (EpochCounter.epoch_number() || 0)
   end
 
   defp check_access(_, :stake), do: true

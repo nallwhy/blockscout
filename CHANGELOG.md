@@ -5,6 +5,7 @@
 - [#2075](https://github.com/poanetwork/blockscout/pull/2075) - add blocks cache
 - [#1991](https://github.com/poanetwork/blockscout/pull/1991) - Make CoinBalance's delta a non-virtual field
 - [#2151](https://github.com/poanetwork/blockscout/pull/2151) - hide dropdown menu then other networks list is empty
+- [#2146](https://github.com/poanetwork/blockscout/pull/2146) - feat: add eth_getLogs rpc endpoint
 
 ### Fixes
 - [#2162](https://github.com/poanetwork/blockscout/pull/2162) - contract creation tile color changed

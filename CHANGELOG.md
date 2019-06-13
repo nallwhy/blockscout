@@ -28,6 +28,7 @@
 - [#2119](https://github.com/poanetwork/blockscout/pull/2119) - fix map logging
 - [#2130](https://github.com/poanetwork/blockscout/pull/2130) - fix navigation
 - [#2149](https://github.com/poanetwork/blockscout/pull/2149) - remove pending transaction count
+- [#2167](https://github.com/poanetwork/blockscout/pull/2168) - feat: document eth rpc api mimicking endpoints 
 
 ### Chore
 - [#2127](https://github.com/poanetwork/blockscout/pull/2127) - use previouse chromedriver version
